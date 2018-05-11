@@ -10,14 +10,15 @@ This Section walks you through the creating CICD pipeline on AWS & development e
 
 * Sign in to the AWS Management Console, and then open the AWS CodeStar console at https://console.aws.amazon.com/codestar/.
 * On the **AWS CodeStar** page, choose **Create a new project**.</br> (If you are the first user to create a project, choose Start a project.)
-* On the **Choose a project template** page, choose **Python web application with Serverless** </br> ![]("images/python-web-serverless.png")
+* On the **Choose a project template** page, choose **Python web application with Serverless** </br> 
+![](images/python-web-serverless.png)
 * On the **Project details** page, type a name for this project. Select **AWS CodeComit** for repository and type the name for repository. Choose **Next**.
 * Review the resources and configuration details. Choose **Create Project**, and continue to setup IDE editor.
 
 #### Launch AWS Cloud9 environment
 
 * On the **Pick how you want to edit your code** page, choose **AWS Cloud9** and choose **Next**. 
-* On the **Set up your AWS Cloud9 environment**, leave it as default and choose **Next** to complete setup. </br> ![](images/python-web-serverless.png)
+* On the **Set up your AWS Cloud9 environment**, leave it as default and choose **Next** to complete setup. </br> ![](images/cloud9-dashboard.png)
 * After environment setup, click **IDE** on left negative bar, and choose **Open IDE** to access AWS Cloud9 IDE,.
 
 ## Overview

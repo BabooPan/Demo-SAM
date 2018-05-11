@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+- AWS::CodeStar
+
+Parameters:
+  ProjectId:
+    Type: String
+    Description: CodeStar projectId used to associate new resources to team members
+  Alias:
+    Type: String
+    Default: 'DemoSAM'
+  DeploymentType:
+    Type: String
+    Default: 'Canary10Percent5Minutes'
+  
+Resources:                        
+  LambdaFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python2.7
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      CodeUri: ./LambdaFunction
+      Description: 'LambdaFunctionforDemo'
+      AutoPublishAlias: !Ref Alias
+      MemorySize: 128
+      Timeout: 300
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+      DeploymentPreference:
+        Type: !Ref DeploymentType

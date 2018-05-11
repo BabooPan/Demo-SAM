@@ -1,0 +1,54 @@
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<title>Lambda Demo</title> 
+</head>
+  <body style="text-align: center; background-image: url('http://d1.awsstatic.com/Test%20Images/orange-checker-bg.002a9a3a85d1b620ab70c4a57722820edde8d4f6.png')">
+    <h1 style="margin-top: 50px">Safe Lambda deployments</h1>
+    <h2 style="margin-top: 50px">Traffic shifting using CodeDeploy</h2>
+</div>
+
+<script>
+
+function sendMessage(i){
+      var url="<Your_API_GATEWAY_ENDPOINT>";
+
+      $.ajax({
+        url: url,
+        type:"GET",
+        success: function( result ) {
+			console.log("Request "+i+", Output: "+result);
+//			console.log(result);
+        },
+        error: function(e){
+			console.log(e);
+         }
+      });
+    }
+
+var i = 0;                   
+
+function myLoop () {         
+   setTimeout(function () {   
+      sendMessage(i);     
+      i++;                     
+      if (i < 20) {            
+         myLoop();             
+      }                        
+   }, 1000)
+}
+
+myLoop(); 
+
+</script>
+
+
+
+
+
+
+</body>
+</html>
+
+
+

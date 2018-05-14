@@ -27,7 +27,7 @@ This Section walks you through the creating CICD pipeline on AWS & development e
 ## Initial with lab material
 ```
 $ git clone https://github.com/KYPan0818/Demo-SAM.git
-$ cd <Your-CodeStar-Project>
+$ cd <Your-CodeStar-Project-Name>
 $ rm -rf buildspec.yml index.py README.md template.yml tests
 $ cp -R ../Demo-SAM/* ./
 $ git add .
@@ -74,6 +74,15 @@ $ curl http://127.0.0.1:3000/
 ```
 
 ## Deploy SAM
+
+#### Add permissions to CloudFormation Role
+
+The role name likes “CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation” </br>
+Policies:
+* AWSLambdaFullAccess
+* IAMFullAccess
+* CloudWatchFullAccess
+* AWSCodeDeployFullAccess
 
 #### Commit & push to AWS CodeCommit 
 ```

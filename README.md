@@ -182,7 +182,7 @@ artifacts:
 
 #### Throw except to response as error
 ```
-$ cat api_template/LambdaFunction_error/error.py
+$ cat api_template/LambdaFunction_error/index.py
 ```
 #### Commit & push to AWS CodeCommit 
 ```

@@ -10,8 +10,7 @@ This Section walks you through the creating CICD pipeline on AWS & development e
 
 * Sign in to the AWS Management Console, and then open the AWS CodeStar console at https://console.aws.amazon.com/codestar/.
 * On the **AWS CodeStar** page, choose **Create a new project**.</br> (If you are the first user to create a project, choose Start a project.)
-* On the **Choose a project template** page, choose **Python web application with Serverless** </br> 
-![](images/python-web-serverless.png)
+* On the **Choose a project template** page, choose **Python web application with Serverless** </br> ![](images/python-web-serverless.png)
 * On the **Project details** page, type a name for this project. Select **AWS CodeComit** for repository and type the name for repository. Choose **Next**.
 * Review the resources and configuration details. Choose **Create Project**, and continue to setup IDE editor.
 
@@ -25,13 +24,53 @@ This Section walks you through the creating CICD pipeline on AWS & development e
 
 ![](images/overview-structure.png)
 
+## Initial with lab material
+```
+$ git clone https://github.com/KYPan0818/Demo-SAM.git
+$ cd <Your-CodeStar-Project>
+$ rm -rf buildspec.yml index.py README.md template.yml tests
+$ cp -R ../Demo-SAM/* ./
+$ git add .
+$ git status
+$ git commit -m "First Deploy"
+$ git push
+```
 
 ## Local testing via SAM CLI
 
 #### Confirm SAM version
-
 ```
 $ sam --version
+```
+> Update SAM version to 0.3.0 (Optional)
+>> https://github.com/awslabs/aws-sam-cli#upgrade-from-version-0-2-11-or-below
+
+#### Test a function payload locally with Lambda function
+```
+$ sam local invoke --template api_template/sam_demo.yml --event event.json
+2018/05/12 14:56:22 Invoking index.handler (python2.7)
+2018/05/12 14:56:22 Mounting /home/ec2-user/environment/Demo-SAM/api_template/LambdaFunction as /var/task:ro inside runtime container
+START RequestId: 65e52f65-324d-4b05-ac40-4b5da3930b55 Version: $LATEST
+END RequestId: 65e52f65-324d-4b05-ac40-4b5da3930b55
+REPORT RequestId: 65e52f65-324d-4b05-ac40-4b5da3930b55 Duration: 1 ms Billed Duration: 100 ms Memory Size: 128 MB Max Memory Used: 14 MB
+
+{"body": "{\"output\": \"Hello, this is from LambdaFunction folder.\", \"timestamp\": \"2018-05-12T14:56:23.562719\"}", "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"}, "statusCode": 200}
+```
+#### Spawn a local API Gateway to test HTTP request and response functionality
+```
+$ sam local start-api --template api_template/sam_demo.yml
+2018/05/12 14:57:20 Connected to Docker 1.35
+2018/05/12 14:57:20 Fetching lambci/lambda:python2.7 image for python2.7 runtime...
+python2.7: Pulling from lambci/lambda
+Digest: sha256:d35515d2938a5b7f24cba04d0034a37ebe0288602947a0d50828638538f4ad90
+Status: Image is up to date for lambci/lambda:python2.7
+
+Mounting index.handler (python2.7) at http://127.0.0.1:3000/ [GET]
+```
+##### Sent HTTP request in another terminal
+```
+$ curl http://127.0.0.1:3000/
+{"output": "Hello, this is from LambdaFunction folder.", "timestamp": "2018-05-12T14:59:26.623211"}
 ```
 
 ## Deploy SAM
@@ -65,7 +104,7 @@ phases:
   build:
     commands:
       - pip install --upgrade awscli
-      - aws cloudformation package --template api_template/demo_sam_deploy.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      - aws cloudformation package --template api_template/sam_demo_deploy.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
 artifacts:
   type: zip
   files:
@@ -125,7 +164,7 @@ phases:
   build:
     commands:
       - pip install --upgrade awscli
-      - aws cloudformation package --template api_template/demo_sam_deploy_alarm.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      - aws cloudformation package --template api_template/sam_demo_deploy_alarm.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
 artifacts:
   type: zip
   files:

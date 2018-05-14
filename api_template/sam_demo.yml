@@ -22,6 +22,7 @@ Resources:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       CodeUri: ./LambdaFunction
       Description: 'LambdaFunctionforDemo'
+      AutoPublishAlias: !Ref Alias
       MemorySize: 128
       Timeout: 300
       Events:

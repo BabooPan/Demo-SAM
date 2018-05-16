@@ -36,7 +36,7 @@ Policies:
 
 #### Initial with lab material
 ```
-$ git clone https://github.com/KYPan0818/Demo-SAM.git
+$ git clone https://github.com/ecloudvalley/Bootcamp-SAM-withCloud9andCodeStar.git
 $ cd <CODESTAR_PROJECT_NAME>
 $ rm -rf buildspec.yml index.py README.md template.yml tests
 $ cp -R ../Demo-SAM/* ./

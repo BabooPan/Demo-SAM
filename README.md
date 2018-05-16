@@ -24,16 +24,37 @@ This Section walks you through the creating CICD pipeline on AWS & development e
 
 ![](images/overview-structure.png)
 
-## Initial with lab material
+## Deploy SAM
+
+#### Add permissions to CloudFormation Role
+The role name likes “CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation” </br>
+Policies:
+* AWSLambdaFullAccess
+* IAMFullAccess
+* CloudWatchFullAccess
+* AWSCodeDeployFullAccess
+
+#### Initial with lab material
 ```
 $ git clone https://github.com/KYPan0818/Demo-SAM.git
-$ cd <Your-CodeStar-Project-Name>
+$ cd <CODESTAR_PROJECT_NAME>
 $ rm -rf buildspec.yml index.py README.md template.yml tests
 $ cp -R ../Demo-SAM/* ./
+```
+
+#### Commit & push to AWS CodeCommit 
+```
 $ git add .
 $ git status
-$ git commit -m "First Deploy"
+$ git commit -m "First deploy SAM"
 $ git push
+```
+
+After pushing, turn on AWS CodePipeline to verify by clicking on "CodePipeline" URL in the "Outputs" tab of CloudFormation or CodeStar project dashboard.
+
+#### Test
+```
+$ while true; do curl -s <API_ENDPOINT>; echo; sleep 1; done
 ```
 
 ## Local testing via SAM CLI
@@ -73,34 +94,7 @@ $ curl http://127.0.0.1:3000/
 {"output": "Hello, this is from LambdaFunction folder.", "timestamp": "2018-05-12T14:59:26.623211"}
 ```
 
-## Deploy SAM
-
-#### Add permissions to CloudFormation Role
-
-The role name likes “CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation” </br>
-Policies:
-* AWSLambdaFullAccess
-* IAMFullAccess
-* CloudWatchFullAccess
-* AWSCodeDeployFullAccess
-
-#### Commit & push to AWS CodeCommit 
-```
-$ git add .
-$ git commit -m "First deploy SAM"
-$ git push
-```
-
-After pushing, turn on AWS CodePipeline to verify by click on "CodePipeline" URL in the "Outputs" tab of CloudFormation.
-
-#### Test
-
-```
-$ while true; do curl -s <API_ENDPOINT>; echo; sleep 1; done
-```
-
 ## Deploy SAM with Canary Deployment
-
 
 #### Modify "buildspec.yml", to use another SAM model 
 
@@ -151,7 +145,7 @@ $ git commit -m "Deploy SAM with Canary"
 $ git push
 ```
 
-After pushing, turn on AWS CodePipeline to verify by click on "CodePipeline" URL in the "Outputs" tab of CloudFormation.
+After pushing, turn on AWS CodePipeline to verify by clicking on "CodePipeline" URL in the "Outputs" tab of CloudFormation or CodeStar project dashboard.
 
 #### Test
 
@@ -191,7 +185,7 @@ $ git commit -m "Deploy SAM with error to trigger roll back"
 $ git push
 ```
 
-After pushing, turn on AWS CodePipeline to verify by click on "CodePipeline" URL in the "Outputs" tab of CloudFormation.
+After pushing, turn on AWS CodePipeline to verify by clicking on "CodePipeline" URL in the "Outputs" tab of CloudFormation or CodeStar project dashboard.
 
 #### Test
 

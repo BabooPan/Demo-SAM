@@ -39,7 +39,7 @@ Policies:
 $ git clone https://github.com/ecloudvalley/Bootcamp-SAM-withCloud9andCodeStar.git
 $ cd <CODESTAR_PROJECT_NAME>
 $ rm -rf buildspec.yml index.py README.md template.yml tests
-$ cp -R ../Demo-SAM/* ./
+$ cp -R ../Bootcamp-SAM-withCloud9andCodeStar/* ./
 ```
 
 #### Commit & push to AWS CodeCommit 

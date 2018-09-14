@@ -1,10 +1,10 @@
 
 # Introduction 
-This section walks you through the creating CICD pipeline by AWS CodeStar and development environment using AWS Cloud9. This will provide you with a cloud-based integrated development environment (IDE) that will let you write, run, debug, and deploy serverless application using just a web browser.
+This section walks you through the creating CICD pipeline by AWS CodeStar and development environment using AWS Cloud9. This will provide you with a cloud-based integrated development environment (IDE) that will let you write, run, debug, and deploy the serverless application using just a web browser.
 
 ## Prepare the C9 & CICD environment
 
->Make sure your are in US East (N. Virginia), which short name is us-east-1.
+>Make sure you are in US East (N. Virginia), which short name is us-east-1.
 
 ### Create project via AWS CodeStar
 
@@ -156,7 +156,7 @@ $ while true; do curl -s <API_ENDPOINT>; echo; sleep 1; done
 > You can get the <API_ENDPOINT> from AWS CodeStar dashboard.
 
 
-## Deploy SAM with error to trigger roll back
+## Deploy SAM with error to trigger a rollback
 
 ### Modify "buildspec.yml", to use another SAM model 
 
@@ -203,8 +203,8 @@ To delete the AWS resources, perform the tasks below in order:
 * Delete AWS CodeStar stack/template from AWS CloudFormation,</br>which named "awscodestar-<CODESTAR_PROJECT_NAME>"
 
 ## Conclusion
-In this post, we demostrated:
-* How to setup a continuous delivery pipeline by AWS CodeStar
+In this post, we demonstrated:
+* How to set up a continuous delivery pipeline by AWS CodeStar
 * Develop with AWS Cloud9
-* Preform Lambda/API Gateway testing by AWS SAM Cli (SAM Local)
-* Deploy SAM within canary deployment
+* Perform Lambda/API Gateway testing by AWS SAM Cli (SAM Local)
+* Deploy SAM within a canary deployment

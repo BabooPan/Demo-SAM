@@ -1,10 +1,18 @@
 version: 0.2
 
 phases:
+  pre_build:
+    command:
+      - echo Updating awscli for newest version
+      - pip install --upgrade awscli
   build:
     commands:
-      - pip install --upgrade awscli
+      - echo Build started on `date`
+      - echo Packaging SAM to CloudFormatino template
       - aws cloudformation package --template api_template/sam_demo.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+  post_build:
+    commands:
+      - echo Build completed on `date`
 artifacts:
   type: zip
   files:

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+    body {
+        margin:0; 
+        background: url("http://d18mnd9mn2y7jb.cloudfront.net/background.jpg");
+        background-position: center top;
+        background-size: 100% auto;
+    }
+
+    .topnav {
+    overflow: hidden;
+    background-color: #333;
+    }
+
+    .topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    }
+
+    .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+    }
+
+    .topnav a.active {
+        background-color: #BB5500;
+        color: white;
+    }
+
+    .topnav a.login {
+        float: right;
+    }
+
+
+    </style>
+    <script>
+        function callAPI() {
+            var httpReq = new XMLHttpRequest();
+            
+            httpReq.open("GET", "<YOUR_API_GATEWAY_ENDPOINT>", true); //true for async
+            httpReq.send(null);
+            httpReq.onreadystatechange = function() { 
+                if (httpReq.readyState == 4 && httpReq.status == 200) {
+                    console.log(httpReq.responseText);
+                    alert(httpReq.responseText);
+                }
+            }
+        }
+        
+    </script>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="topnav">
+  <a href="index.htm" class="active">Home</a>
+  <a href="https://www.ecloudture.com/">eCloudture</a>
+  <a href="https://www.ecloudvalley.com/">eCloudvalley</a>
+</nav>
+
+<!-- Main -->
+<div style="text-align: center;">
+        <h2 style="font-size: 104px; color:white;margin-bottom: 12px"><i>Welcome.</i></h2>
+        <button  onclick="callAPI()">Check it out!</button>
+    </div>
+
+</body>
+</html>

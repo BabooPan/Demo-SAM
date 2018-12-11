@@ -4,6 +4,7 @@ This section walks you create a static website on S3 and how to integrate the AP
 <p align="center">
     <img src="images/Static-website-on-s3.png">
 </p>
+
 ### Before you begin
 
 >Make sure you've created pipeline for CICD. If not, please create it first with [Run-Serverless-CICD-Pipeline-with-AWS-CodeStar-and-Develop-with-AWS-Cloud9](/README.md).
@@ -14,14 +15,6 @@ This section walks you create a static website on S3 and how to integrate the AP
 You can host a static website on Amazon Simple Storage Service (Amazon S3). </br>
 On a static website, individual webpages include static content. They might also contain client-side scripts. </br>
 To host a static website, you configure an Amazon S3 bucket for website hosting, and then upload your website content to the bucket.
-
-### Get Web File
-In this step, we'll get the webpage and modify it.
-
-* Download and open the webpage file, **index.html**.
-* There's `httpReq.open("GET", "<YOUR_API_GATEWAY_ENDPOINT>", true);` in line 48, </br>
-Please modify ***\<YOUR_API_GATEWAY_ENDPOINT\>*** to your endpoint which created in previous, [Run-Serverless-CICD-Pipeline-with-AWS-CodeStar-and-Develop-with-AWS-Cloud9](/README.md).
-* Then save and close the file.
 
 ### Create a S3 bucket
 The web page need to be stored and performed with apache server. </br>
@@ -49,12 +42,24 @@ In this case, we'll create a S3 bucket for it and also enable public access that
 * Choose **Next**.
 * On the **Review** page, verify the settings. And then choose **Create bucket**.
 
-### Upload web page to S3 Bucket
+### Get Web File
+In this step, we'll get the webpage and modify it.
 
-* Select the bucket just created.
-* Choose **Upload**.
-* Choose **Add files**, select and add the **index.html** file just modified.
-* Choose **Upload** on lower left side to upload objects without any setting.
+* Open the webpage file, **index.html**, in your Cloud9 environment.
+* There's `httpReq.open("GET", "<YOUR_API_GATEWAY_ENDPOINT>", true);` in line 48, </br>
+Please modify ***\<YOUR_API_GATEWAY_ENDPOINT\>*** to your endpoint.
+> The endpoint created in [Run-Serverless-CICD-Pipeline-with-AWS-CodeStar-and-Develop-with-AWS-Cloud9](/README.md).
+* Then save the file.
+
+### Upload web page to S3 Bucket
+We'll upload the web file to the S3 bucket just created via AWS CLI.
+
+* In the Cloud9 terminal, type the command below, the command copy the file into S3 bucket.
+```
+aws s3 cp ~/environment/<YOUR_PROJECT_NAME>/index.html s3://<YOUR_BUCKET_NAME>
+```
+> Please modify both ***\<YOUR_PROJECT_NAME\>*** and ***\<YOUR_BUCKET_NAME\>*** to yours.
+* Back to the S3 console, and select the bucket just created.
 * Check the status of the object and exists in S3 bucket or not.
 
 
@@ -79,19 +84,20 @@ Follow these steps to enable website hosting for your bucket.
 
 ```
 {
-    "Version":"2012-10-17",
-    "Statement":[{
-    	"Sid":"PublicReadGetObject",
-	    "Effect":"Allow",
-    	"Principal": "*",
-	    "Action":[
-    	    "s3:GetObject"
-        ],
-	    "Resource":[
-    		"arn:aws:s3:::<YOUR_BUCKET_NAME>/*"
-        ]
-    	}
-	]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<YOUR_BUCKET_NAME>/*"
+            ]
+        }
+    ]
 }
 ```
 <p align="center">

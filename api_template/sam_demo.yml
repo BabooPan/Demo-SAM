@@ -10,25 +10,45 @@ Parameters:
   Alias:
     Type: String
     Default: 'DemoSAM'
+  Stage:
+    Type: String
+    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    Default: ''
   
 Resources:
   LambdaFunction1:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python2.7
+      Runtime: python3.6
       Role:
-        Fn::ImportValue:
-          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
       CodeUri: ./LambdaFunction
       Description: 'LambdaFunctionforDemo'
       AutoPublishAlias: !Ref Alias
       MemorySize: 128
       Timeout: 300
       Events:
-        GetResource:
+        GetEvent:
           Type: Api
           Properties:
             Path: /
             Method: get
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'CodeStar-${ProjectId}-Execution${Stage}'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
 

@@ -12,7 +12,11 @@ Parameters:
     Default: 'DemoSAM'
   DeploymentType:
     Type: String
-    Default: 'Canary10Percent10Minutes'
+    Default: 'Canary10Percent5Minutes'
+  Stage:
+    Type: String
+    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    Default: ''
     
 Resources:
   FunctionAlarm1:
@@ -103,8 +107,9 @@ Resources:
       Handler: index.handler
       Runtime: python2.7
       Role:
-        Fn::ImportValue:
-          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
       CodeUri: ./LambdaFunction
       Description: 'LambdaFunctionforDemo'
       AutoPublishAlias: !Ref Alias
@@ -122,7 +127,21 @@ Resources:
         Type: !Ref DeploymentType
         Alarms:
           - !Ref FunctionAlarm1
-        
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'CodeStar-${ProjectId}-Execution${Stage}'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'      
 
 Outputs:
   ApiUrl:

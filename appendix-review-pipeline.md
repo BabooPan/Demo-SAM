@@ -46,6 +46,7 @@ The source code must contain a build specification (build spec) file, or the bui
 		* Updating awscli to newest version.		
 	* Build stage:
 		* Packaging SAM to CloudFormatino template.
+    * Generate a template configuation file which required for AWS CodeStar projects.
 	* Post-build stage:
 		* Export the CloudFormation template as zip. The deployment stage of your CD pipeline uses this information to create a new revision of your CloudFormation stack, and then it updates the serverless application to use the new package.
 
@@ -55,13 +56,19 @@ version: 0.2
 phases:
   pre_build:
     command:
-      - echo Updating awscli to newest version
+      - echo Updating awscli for newest version
       - pip install --upgrade awscli
   build:
     commands:
       - echo Build started on `date`
       - echo Packaging SAM to CloudFormatino template
-      - aws cloudformation package --template api_template/sam_demo.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      
+      # Use AWS SAM to package the application by using AWS CloudFormation
+      - aws cloudformation package --template api_template/sam_demo_deploy_alarm.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      
+      # Do not remove this statement. This command is required for AWS CodeStar projects.
+      # Update the AWS Partition, AWS Region, account ID and project ID in the project ARN on template-configuration.json file so AWS CloudFormation can tag project resources.
+      - sed -i.bak 's/\$PARTITION\$/'${PARTITION}'/g;s/\$AWS_REGION\$/'${AWS_REGION}'/g;s/\$ACCOUNT_ID\$/'${ACCOUNT_ID}'/g;s/\$PROJECT_ID\$/'${PROJECT_ID}'/g' template-configuration.json
   post_build:
     commands:
       - echo Build completed on `date`
@@ -69,6 +76,7 @@ artifacts:
   type: zip
   files:
     - template-export.yml
+    - template-configuration.json
 ```
 > For more details about build specification, please refer [Build Specification Reference](https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html)
 
@@ -101,30 +109,52 @@ Parameters:
   Alias:
     Type: String
     Default: 'DemoSAM'
+  Stage:
+    Type: String
+    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    Default: ''
   
 Resources:
-  LambdaFunction1: // Config for Lambda function
+  LambdaFunction1:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python2.7
+      Runtime: python3.6
       Role:
-        Fn::ImportValue:
-          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
-      CodeUri: ./LambdaFunction // The location of source code, package could be either in this repo or S3 Bucket
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
+      CodeUri: ./LambdaFunction
       Description: 'LambdaFunctionforDemo'
       AutoPublishAlias: !Ref Alias
       MemorySize: 128
       Timeout: 300
-      Events: // Config for API Gateway
-        GetResource:
+      Events:
+        GetEvent:
           Type: Api
           Properties:
             Path: /
             Method: get
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'CodeStar-${ProjectId}-Execution${Stage}'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
+
+
 ```
 In the build stage, CodeBuild package SAM template to CloudFormation format, and output to S3. </br>
-CloudFormation take the output template to generate change set and make a revision to stack for provision new version resources.
+CloudFormation take the packaged template to generate change set and make a revision to stack for provision new version resources.
 
 * Open the [AWS CloudFormation console](https://console.aws.amazon.com/cloudformation/home).
 * On this page, you'll get 3 stacks as below:
@@ -139,6 +169,18 @@ CloudFormation take the output template to generate change set and make a revisi
 * Choose either one stack.
 * In ***stack details***, you can get the stack info, deploy events, provisioned resources, deploy output,or event template source code.
 * In ***Change sets*** on left negative menu under stack, you can review the change set details.
+
+## AWS CodeDeploy
+AWS Lambda and AWS CodeDeploy made it possible to automatically shift incoming traffic between two function versions based on a preconfigured rollout strategy. This feature allows you to gradually shift traffic to the new function. If there are any issues with the new code, you can quickly rollback and control the impact to your application. </br></br>
+In this case, CodeDeploy deployment provisioned by SAM and CloudFormation, which setup for deployment actions. That's why we attach permission to CloudFormation role to execute the SAM and CloudFormation deployment.
+
+* Open the [AWS CodeDeploy console](https://console.aws.amazon.com/codesuite/codedeploy/home).
+* Click ***Deployments*** on the left negative menu under **Deploy ● CodeDeploy**. </br> And choose any Deployment Id to review deployment.</br>
+<p align="center">
+    <img src="images/codedeploy-1.jpg" width="80%" height="80%">
+</p>
+
+* On this page, you can get the deployment details.
 
 ## AWS CodePipeline
 

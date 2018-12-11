@@ -30,12 +30,19 @@ Select **AWS CodeComit** for repository and type the name for repository.</br>Ch
 
 ### Add permissions to CloudFormation Role
 This step help us attach permissions to CloudFormation role to provision resources needed for deploying SAM. </br>
-The role name likes "___CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation___". </br>
-Policies:
-* AWSLambdaFullAccess
-* IAMFullAccess
-* CloudWatchFullAccess
-* AWSCodeDeployFullAccess
+</br>
+* Open the [IAM console](https://console.aws.amazon.com/iam/).
+* In the navigation pane, choose **Role**.
+* In the list roles, type "CloudFormation" in the search box to filter.
+* Choose the CloudFormation role provisioned by CodeStar.
+> The role name likes "___CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation___". 
+* Choose **Attach policies** to add permission.
+* In **Attach Permissions** page, search and check below polices:
+  * AWSLambdaFullAccess
+  * IAMFullAccess
+  * CloudWatchFullAccess
+  * AWSCodeDeployFullAccess
+* Then, choose **Attach policy** to attach them.
 > For details, please refer [Adding and Removing IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html#add-remove-policies-console) 
 
 ### Initial with lab material
@@ -43,7 +50,7 @@ Deploy the lab sources instead of sample code from template.
 ```
 $ git clone https://github.com/ecloudvalley/Run-Serverless-CICD-Pipeline-with-AWS-CodeStar-and-Develop-with-AWS-Cloud9.git
 $ cd <CODESTAR_PROJECT_NAME>
-$ rm -rf buildspec.yml index.py README.md template.yml tests
+$ rm -rf ./*
 $ cp -R ../Run-Serverless-CICD-Pipeline-with-AWS-CodeStar-and-Develop-with-AWS-Cloud9/* ./
 ```
 
@@ -103,6 +110,7 @@ $ sam local start-api --template api_template/sam_demo.yml
 #### Sent HTTP request in another terminal
 ```
 $ curl http://127.0.0.1:3000/
+
 {"output": "Hello, this is from LambdaFunction folder.", "timestamp": "2018-05-12T14:59:26.623211"}
 ```
 Now, you've learned how to develop sam and test it locally.
@@ -118,15 +126,26 @@ $ vim buildspec.yml
 ```
 ```
 version: 0.2
+
 phases:
+  pre_build:
+    command:
+      - echo Updating awscli for newest version
+      - pip install --upgrade awscli
   build:
     commands:
-      - pip install --upgrade awscli
+      - echo Build started on `date`
+      - echo Packaging SAM to CloudFormatino template
       - aws cloudformation package --template api_template/sam_demo_deploy.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      - sed -i.bak 's/\$PARTITION\$/'${PARTITION}'/g;s/\$AWS_REGION\$/'${AWS_REGION}'/g;s/\$ACCOUNT_ID\$/'${ACCOUNT_ID}'/g;s/\$PROJECT_ID\$/'${PROJECT_ID}'/g' template-configuration.json
+  post_build:
+    commands:
+      - echo Build completed on `date`
 artifacts:
   type: zip
   files:
     - template-export.yml
+    - template-configuration.json
 ```
 
 ### Edit the output string of "api_template/LambdaFunction/index.py"
@@ -157,6 +176,7 @@ def handler(event, context):
 ### Commit & push to AWS CodeCommit 
 ```
 $ git add .
+$ git status
 $ git commit -m "Deploy SAM with Canary"
 $ git push
 ```
@@ -164,7 +184,8 @@ $ git push
 After pushing, verify the deployment stage on CodeStar project dashboard, </br>or turn on AWS CodePipeline to verify by clicking on "CodePipeline" URL in the "Outputs" tab of CloudFormation.
 
 ### Test
-You will get the response on old/new response body about at 90/10 percentage, after a while, the response will show the new version.
+You will get the response on old/new response body about at 90/10 percentage when CodeDeploy performing Canary deploy. </br>
+And you can aslo verify the in-progessing deployment via CodeDeploy console.
 ```
 $ while true; do curl -s <API_ENDPOINT>; echo; sleep 1; done
 ```
@@ -181,25 +202,39 @@ $ vim buildspec.yml
 ```
 ```
 version: 0.2
+
 phases:
+  pre_build:
+    command:
+      - echo Updating awscli for newest version
+      - pip install --upgrade awscli
   build:
     commands:
-      - pip install --upgrade awscli
+      - echo Build started on `date`
+      - echo Packaging SAM to CloudFormatino template
       - aws cloudformation package --template api_template/sam_demo_deploy_alarm.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
+      - sed -i.bak 's/\$PARTITION\$/'${PARTITION}'/g;s/\$AWS_REGION\$/'${AWS_REGION}'/g;s/\$ACCOUNT_ID\$/'${ACCOUNT_ID}'/g;s/\$PROJECT_ID\$/'${PROJECT_ID}'/g' template-configuration.json
+  post_build:
+    commands:
+      - echo Build completed on `date`
 artifacts:
   type: zip
   files:
     - template-export.yml
+    - template-configuration.json
 ```
 
 ### Throw except to response as error
 This function would throw error response to API Gateway.
 ```
 $ cat api_template/LambdaFunction_error/index.py
+def handler(event, context):
+    raise Exception('Exception occured')
 ```
 ### Commit & push to AWS CodeCommit 
 ```
 $ git add .
+$ git status
 $ git commit -m "Deploy SAM with error to trigger roll back"
 $ git push
 ```

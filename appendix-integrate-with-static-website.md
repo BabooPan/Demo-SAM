@@ -32,7 +32,7 @@ In this case, we'll create a S3 bucket for it and also enable public access that
 * On the **Set permissions** page, you manage the permissions that are set on the bucket that you are creating.
 * Under **Public access settings for this bucket**, cancel the default settings that are listed under **Manage public access control lists (ACLs) for this bucket** or **Manage public bucket policies for this bucket**.
 
-> Because of this would lead you store web page on S3, the bucket should be open to would. </br>
+> Because of this would lead you store web page on S3, the bucket should be open to world. </br>
 > Otherwise, We highly recommend that you keep the default access settings for blocking public access to the bucket that you are creating.
 
 <p align="center">

@@ -260,8 +260,9 @@ Here's appendix to help you learn more between Serverless and DevOps.
 ## Clean Up
 To delete the AWS resources, perform the tasks below in order:
 * Delete the project from AWS CodeStar dashboard.
-* Detach the 4 attached policies from CloudFormation IAM Role,</br>the role name likes "CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation".
 * Delete AWS CodeStar stack/template from AWS CloudFormation,</br>which named "awscodestar-<CODESTAR_PROJECT_NAME>"
+* Detach the 4 attached policies from CloudFormation IAM Role,</br>the role name likes "CodeStarWorker-<CODESTAR_PROJECT_NAME>-CloudFormation".
+* Delete the S3 bucket provisioned by CodeStar.
 
 ## Conclusion
 In this post, we demostrated:

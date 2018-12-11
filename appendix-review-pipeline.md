@@ -12,7 +12,7 @@ This section walks you each services through the creating CICD pipeline by AWS C
 ## Overview
 
 <p align="center">
-    <img src="images/cicd-pipeline.jpg">
+    <img src="images/cicd-pipeline.png">
 </p>
 
 ## AWS CodeCommit Repository
@@ -45,7 +45,7 @@ The source code must contain a build specification (build spec) file, or the bui
 	* Pre-build stage:
 		* Updating awscli to newest version.		
 	* Build stage:
-		* Packaging SAM to CloudFormatino template.
+		* Packaging SAM to CloudFormation template.
     * Generate a template configuation file which required for AWS CodeStar projects.
 	* Post-build stage:
 		* Export the CloudFormation template as zip. The deployment stage of your CD pipeline uses this information to create a new revision of your CloudFormation stack, and then it updates the serverless application to use the new package.

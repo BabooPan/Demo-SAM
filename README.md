@@ -160,14 +160,14 @@ import datetime
 
 def handler(event, context):
     data = {
-        'output': 'This is new version deploy.', // Make this string different from previous.
+        'output': 'This is new version deploy.', # Make this string different from previous.
         'timestamp': datetime.datetime.utcnow().isoformat()
     }
     return {'statusCode': 200,
             'body': json.dumps(data),
             'headers': {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*' // Enable CORS on API endpoint.
+                'Access-Control-Allow-Origin': '*' # Enable CORS on API endpoint.
             }
         }
 ```
